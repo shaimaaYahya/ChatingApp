@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AccountService } from '../_services/account.service';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-register',
@@ -21,6 +22,7 @@ export class RegisterComponent {
   private accountService = inject(AccountService);
   // usersFromHomeComponent = input.required<any>();
   /*@Output()*/ cancelRegister = output<boolean>() /*new EventEmitter()*/;
+  private toastr = inject(ToastrService);
   model: any = {};
 
   register() {
@@ -28,8 +30,8 @@ export class RegisterComponent {
       next: (response) => {
         console.log(response);
       },
-      error: (error) => console.log(error),
-      complete: () => console.log('done'),
+      error: (error) => this.toastr.error(error.error),
+      complete: () => this.toastr.success("Registration done successfuly"),
     });
   }
 
