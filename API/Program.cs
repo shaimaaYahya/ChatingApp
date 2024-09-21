@@ -32,8 +32,25 @@ var app = builder.Build();
 //app.UseDeveloperExceptionPage();
 app.UseMiddleware<ExceptionMiddleware>();
 app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:4200", "https://localhost:4200"));
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
+
+//for seeding user data
+using var scope = app.Services.CreateScope(); // to look for a service inside depenedecy injection
+var services = scope.ServiceProvider;
+try
+{
+    var context = services.GetRequiredService<DataContext>();
+    await context.Database.MigrateAsync();
+    await Seed.SeedUsers(context);
+}
+catch (Exception ex)
+{
+    var logger = services.GetRequiredService<ILogger<Program>>();
+    logger.LogError(ex, "An error occurred during migration");
+}
 
 app.Run();

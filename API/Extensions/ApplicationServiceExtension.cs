@@ -18,6 +18,8 @@ public static class ApplicationServiceExtensions
         });
         services.AddCors();//for solving http request security problems
         services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<IUserRepositry, Data.UserRepositry>();
+        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
         return services;
     }
