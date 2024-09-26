@@ -1,4 +1,5 @@
 using System;
+using System.Security.Claims;
 using API.Data;
 using API.DTOs;
 using API.Entities;
@@ -34,6 +35,26 @@ public class UsersController(IUserRepositry userRepositry, IMapper mapper) : Bas
         //var userToReturn = mapper.Map<MemberDto>(user);
 
         return user;
+    }
+
+    [HttpPut]
+    public async Task<ActionResult> UpdateUser(MemberUpdateDto memberUpdateDto){
+
+        var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if(username == null) return BadRequest("No username found in token"); 
+
+        var user = await userRepositry.GetUserByUsernameAsync(username);
+
+        if(user == null) return BadRequest("Could not find user");
+
+        mapper.Map(memberUpdateDto, user);
+
+        //userRepositry.Update(user);
+
+        if(await userRepositry.SaveAllAsync()) return NoContent();
+
+        return BadRequest("Failed to update the user"); 
     }
 
     // [HttpGet("{id:int}")]
