@@ -14,9 +14,10 @@ public class AccountController(DataContext context, ITokenService tokenService) 
 {
     [HttpPost("register")]
     public async Task<ActionResult<UserDto>> Register(DTOs.RegisterDto registerDto
-    /*[FromQuery] string username,[FromQuery] string password*/){
+    /*[FromQuery] string username,[FromQuery] string password*/)
+    {
 
-        if(await UserExists(registerDto.Username)) return BadRequest("Username is taken");
+        if (await UserExists(registerDto.Username)) return BadRequest("Username is taken");
 
         return Ok();
         // using var hmac = new HMACSHA512();
@@ -29,7 +30,7 @@ public class AccountController(DataContext context, ITokenService tokenService) 
 
         // context.Users.Add(user);
         // await context.SaveChangesAsync();
-        
+
         // return new UserDto
         // {
         //     Username = user.UserName,
@@ -39,11 +40,12 @@ public class AccountController(DataContext context, ITokenService tokenService) 
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult<UserDto>> Login(LoginDto loginDto){
-        
-        var user = await context.Users.FirstOrDefaultAsync(x => x.UserName == loginDto.Username.ToLower());
+    public async Task<ActionResult<UserDto>> Login(LoginDto loginDto)
+    {
 
-        if(user == null) return Unauthorized("Invalid username");
+        var user = await context.Users.Include(p => p.Photos).FirstOrDefaultAsync(x => x.UserName == loginDto.Username.ToLower());
+
+        if (user == null) return Unauthorized("Invalid username");
 
         using var hmac = new HMACSHA512(user.PasswordSalt);
 
@@ -51,17 +53,19 @@ public class AccountController(DataContext context, ITokenService tokenService) 
 
         for (int i = 0; i < computeHash.Length; i++)
         {
-            if(computeHash[i] != user.PasswordHash[i]) return Unauthorized("Invalid password");
+            if (computeHash[i] != user.PasswordHash[i]) return Unauthorized("Invalid password");
         }
 
         return new UserDto
         {
             Username = user.UserName,
             Token = tokenService.CreateUser(user),
+            PhotoUrl = user.Photos.FirstOrDefault(x => x.IsMain)?.Url
         };
     }
 
-    private async Task<bool> UserExists(string username){
+    private async Task<bool> UserExists(string username)
+    {
         return await context.Users.AnyAsync(x => x.UserName.ToLower() == username.ToLower());
     }
 

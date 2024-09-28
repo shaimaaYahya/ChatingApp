@@ -1,5 +1,6 @@
 using System;
 using API.Data;
+using API.Helpers;
 using API.Interfaces;
 using API.Services;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +20,9 @@ public static class ApplicationServiceExtensions
         services.AddCors();//for solving http request security problems
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IUserRepositry, Data.UserRepositry>();
+        services.AddScoped<IPhotoService, PhotoService>();
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+        services.Configure<UploadcareSettings>(config.GetSection("Uploadcare"));
 
         return services;
     }
