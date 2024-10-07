@@ -24,7 +24,7 @@ export class RegisterComponent implements OnInit{
   private fb = inject(FormBuilder);
   // usersFromHomeComponent = input.required<any>();
   /*@Output()*/ cancelRegister = output<boolean>() /*new EventEmitter()*/;
-  // private toastr = inject(ToastrService);
+  private toastr = inject(ToastrService);
   private router = inject(Router);
   // model: any = {};
   registerForm: FormGroup = new FormGroup({});

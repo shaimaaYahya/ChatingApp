@@ -18,11 +18,13 @@ public class UsersController(IUserRepositry userRepositry, IMapper mapper, IPhot
     //private readonly DataContext _context = context;
     //[AllowAnonymous]
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers()
+    public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers([FromQuery]Helpers.UserParams userParams)
     {
         //var users = await userRepositry.GetUsersAsync();
         //var usersToReturn = mapper.Map<IEnumerable<MemberDto>>(users);
-        var users = await userRepositry.GetMembersAsync();
+        userParams.CurrentUsername = User.GetUserName();
+        var users = await userRepositry.GetMembersAsync(userParams);
+        Response.AddPaginationHeader(users);
         return Ok(users);
     }
 

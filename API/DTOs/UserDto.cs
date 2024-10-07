@@ -11,5 +11,6 @@ public class UserDto
     // public required string City { get; set; }
     // public required string Country { get; set; }
     public required string Token { get; set; }
+    public required string Gender { get; set; }
     public String? PhotoUrl { get; set; }
 }
