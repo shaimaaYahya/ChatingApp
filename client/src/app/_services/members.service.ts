@@ -7,6 +7,7 @@ import { Photo } from '../_models/photo';
 import { PaginatedResult } from '../_models/pagination';
 import { UserParams } from '../_models/userParams';
 import { AccountService } from './account.service';
+import { setPaginatedResponse, setPaginationHeaders } from './paginationHelper';
 
 @Injectable({
   providedIn: 'root',
@@ -28,10 +29,10 @@ export class MembersService {
   getMembers(/*userParams: UserParams*/) {
     const response = this.memberCache.get(Object.values(this.userParams()).join('-'));
 
-    if(response) return this.setPaginatedResponse(response);
+    if(response) return setPaginatedResponse(response, this.paginationResult);
 
     console.log(Object.values(this.userParams()).join('-'));
-    let params = this.setPaginationHeaders(this.userParams().pageNumber, this.userParams().pageSize);
+    let params = setPaginationHeaders(this.userParams().pageNumber, this.userParams().pageSize);
 
     params = params.append('minAge', this.userParams().minAge);
     params = params.append('maxAge', this.userParams().maxAge);
@@ -46,28 +47,10 @@ export class MembersService {
       .subscribe({
         //next: (members) => this.members.set(members),
         next: (response) => {
-          this.setPaginatedResponse(response);
+          setPaginatedResponse(response, this.paginationResult);
           this.memberCache.set(Object.values(this.userParams()).join('-'), response);
         },
       });
-  }
-
-  private setPaginatedResponse(response: HttpResponse<Member[]>){
-    this.paginationResult.set({
-      items: response.body as Member[],
-      pagination: JSON.parse(response.headers.get('Pagination')!),
-    });
-  }
-
-  private setPaginationHeaders(pageNumber?: number, pageSize?: number) {
-    let params = new HttpParams();
-
-    if (pageNumber && pageSize) {
-      params = params.append('pageNumber', pageNumber);
-      params = params.append('pageSize', pageSize);
-    }
-
-    return params;
   }
 
   getMember(username: string) {
