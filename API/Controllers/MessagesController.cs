@@ -28,7 +28,7 @@ public class MessagesController(IMessageRepository messageRepository,
         var sender = await userRepositry.GetUserByUsernameAsync(username);
         var recipient = await userRepositry.GetUserByUsernameAsync(createMessageDto.RecipientUsername);
 
-        if (recipient == null || sender == null) return BadRequest("Cannot send message at this time");
+        if (recipient == null || sender == null || sender.UserName == null || recipient.UserName == null) return BadRequest("Cannot send message at this time");
 
         var message = new Message
         {
@@ -78,14 +78,15 @@ public class MessagesController(IMessageRepository messageRepository,
 
         if (message.SenderUsername != username && message.RecipientUsername != username) return Forbid();
 
-        if(message.SenderUsername == username) message.SenderDeleted = true;
-        if(message.RecipientUsername == username) message.ReciptentDeleted = true;
+        if (message.SenderUsername == username) message.SenderDeleted = true;
+        if (message.RecipientUsername == username) message.ReciptentDeleted = true;
 
-        if(message is {SenderDeleted: true, ReciptentDeleted: true}){
+        if (message is { SenderDeleted: true, ReciptentDeleted: true })
+        {
             messageRepository.DeleteMessage(message);
         }
 
-        if(await messageRepository.SaveAllAsync()) return Ok(); 
+        if (await messageRepository.SaveAllAsync()) return Ok();
 
         return BadRequest("Problem deleting the message");
     }

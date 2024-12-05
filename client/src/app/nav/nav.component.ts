@@ -6,14 +6,21 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Router, RouterLinkActive, RouterModule } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { TitleCasePipe } from '@angular/common';
-
+import { HasRoleDirective } from '../_directives/has-role.directive';
 
 @Component({
   selector: 'app-nav',
   standalone: true,
-  imports: [FormsModule/*, NgIf*/,BsDropdownModule, RouterModule, RouterLinkActive, TitleCasePipe],
+  imports: [
+    FormsModule /*, NgIf*/,
+    BsDropdownModule,
+    RouterModule,
+    RouterLinkActive,
+    TitleCasePipe,
+    HasRoleDirective,
+  ],
   templateUrl: './nav.component.html',
-  styleUrl: './nav.component.css'
+  styleUrl: './nav.component.css',
 })
 export class NavComponent {
   accountService = inject(AccountService);
@@ -21,17 +28,17 @@ export class NavComponent {
   private toastr = inject(ToastrService);
   model: any = {};
 
-  login(){
+  login() {
     this.accountService.login(this.model).subscribe({
-      next: response => {
-        this.router.navigateByUrl("/members");
+      next: (response) => {
+        this.router.navigateByUrl('/members');
       },
-      error: error => this.toastr.error(error.error),
+      error: (error) => this.toastr.error(error.error),
     });
   }
 
-  logout(){
+  logout() {
     this.accountService.logout();
-    this.router.navigateByUrl("/");
+    this.router.navigateByUrl('/');
   }
 }

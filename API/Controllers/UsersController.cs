@@ -12,11 +12,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers;
 
-//[Authorize]
+[Authorize]
 public class UsersController(IUserRepositry userRepositry, IMapper mapper, IPhotoService photoService) : BaseApiController
 {
     //private readonly DataContext _context = context;
     //[AllowAnonymous]
+    //[Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers([FromQuery]Helpers.UserParams userParams)
     {
@@ -28,7 +29,7 @@ public class UsersController(IUserRepositry userRepositry, IMapper mapper, IPhot
         return Ok(users);
     }
 
-    //[Authorize]
+    //[Authorize(Roles = "Member")]
     [HttpGet("{username}")]
     public async Task<ActionResult<MemberDto>> GetUser(string username)
     {
