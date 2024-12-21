@@ -1,4 +1,4 @@
-import { Component, inject, input, OnInit, output, ViewChild } from '@angular/core';
+import { AfterViewChecked, Component, inject, input, OnInit, output, ViewChild } from '@angular/core';
 import { Message } from '../../_models/message';
 import { MessageService } from '../../_services/message.service';
 import { TimeagoModule } from 'ngx-timeago';
@@ -12,8 +12,9 @@ import { FormsModule, NgForm } from '@angular/forms';
   templateUrl: './member-messages.component.html',
   styleUrl: './member-messages.component.css'
 })
-export class MemberMessagesComponent implements OnInit{
+export class MemberMessagesComponent implements OnInit, AfterViewChecked{
   @ViewChild('messageForm') messageForm?: NgForm;
+  @ViewChild('scrollMe') scrollContainer?: any;
   messageService = inject(MessageService);
   username = input.required<string>();
   // messages = input.required<Message[]>();
@@ -22,6 +23,16 @@ export class MemberMessagesComponent implements OnInit{
 
   ngOnInit(): void {
     // this.loadMessages();
+  }
+
+  ngAfterViewChecked(): void {
+    this.scrollToBottom();
+  }
+
+  private scrollToBottom(){
+    if(this.scrollContainer){
+      this.scrollContainer.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollHeight;
+    }
   }
 
   sendMessage(){
@@ -34,6 +45,7 @@ export class MemberMessagesComponent implements OnInit{
 
     this.messageService.sendMessage(this.username(), this.messageContent).then(()=>{
       this.messageForm?.reset();
+      this.scrollToBottom();
     });
   }
 
